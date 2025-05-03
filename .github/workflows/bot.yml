@@ -22,16 +22,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Decode YouTube cookies
+      run: |
+        echo "$YOUTUBE_COOKIES_B64" | base64 -d > cookies.txt
+      env:
+        YOUTUBE_COOKIES_B64: ${{ secrets.YOUTUBE_COOKIES_B64 }}
+
     - name: Run the bot
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
       run: |
         echo "DISCORD_TOKEN=$DISCORD_TOKEN" > .env
         python bot.py
-
-    - name: Decode YouTube cookies
-      run: |
-        echo "$YOUTUBE_COOKIES_B64" | base64 -d > cookies.txt
-       env:
-        YOUTUBE_COOKIES_B64: ${{ secrets.YOUTUBE_COOKIES_B64 }}
-
