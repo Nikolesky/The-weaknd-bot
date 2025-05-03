@@ -54,23 +54,24 @@ async def play(ctx, *, search: str):
 
     await ctx.send(f"🔍 Searching for: `{search}`...")
 
-    ydl_opts = {
-        'cookiefile': 'cookies.txt',  # <-- Valid cookies file
-        'format': 'bestaudio/best',
-        'noplaylist': True,
-        'quiet': True,
-        'default_search': 'ytsearch1',
-    }
+    def search_video(search_query):
+        ydl_opts = {
+            'cookiefile': 'cookies.txt',
+            'format': 'bestaudio/best',
+            'noplaylist': True,
+            'quiet': True,
+            'default_search': 'ytsearch1',
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(search_query, download=False)
+            video_url = info['entries'][0]['url'] if 'entries' in info else info['url']
+            return video_url, info['entries'][0]['title'] if 'entries' in info else info['title']
 
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(search, download=False)
-            url = info['entries'][0]['url'] if 'entries' in info else info['url']
-            title = info['entries'][0]['title'] if 'entries' in info else info['title']
-
-        source = await discord.FFmpegOpusAudio.from_probe(url, method='fallback')
-
-        vc.stop()  # Stop current audio if any
+        video_url, title = search_video(search)
+        source = await discord.FFmpegOpusAudio.from_probe(video_url, method='fallback')
+        vc.stop()
         vc.play(source)
 
         await ctx.send(f"🎶 Now playing: **{title}**")

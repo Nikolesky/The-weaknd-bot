@@ -1,8 +1,9 @@
-name: Run Discord Bot
+name: Deploy and Run Discord Bot
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   run-bot:
