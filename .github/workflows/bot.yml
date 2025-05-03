@@ -28,3 +28,10 @@ jobs:
       run: |
         echo "DISCORD_TOKEN=$DISCORD_TOKEN" > .env
         python bot.py
+
+    - name: Decode YouTube cookies
+      run: |
+        echo "$YOUTUBE_COOKIES_B64" | base64 -d > cookies.txt
+       env:
+        YOUTUBE_COOKIES_B64: ${{ secrets.YOUTUBE_COOKIES_B64 }}
+

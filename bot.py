@@ -55,12 +55,14 @@ async def play(ctx, *, search: str):
     await ctx.send(f"🔍 Searching for: `{search}`...")
 
     ydl_opts = {
-        'format': 'bestaudio',
-        'noplaylist': True,
-        'quiet': True,
-        'default_search': 'ytsearch1',
-        'extract_flat': False,
+    'format': 'bestaudio',
+    'noplaylist': True,
+    'quiet': True,
+    'default_search': 'ytsearch1',
+    'extract_flat': False,
+    'cookiefile': 'cookies.txt'  # ✅ important line
     }
+
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(search, download=False)
