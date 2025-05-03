@@ -55,26 +55,27 @@ async def play(ctx, *, search: str):
     await ctx.send(f"🔍 Searching for: `{search}`...")
 
     ydl_opts = {
-    'format': 'bestaudio',
-    'noplaylist': True,
-    'quiet': True,
-    'default_search': 'ytsearch1',
-    'extract_flat': False,
-    'cookiefile': 'cookies.txt'  # ✅ important line
+        'cookiefile': 'cookies.txt',  # <-- Valid cookies file
+        'format': 'bestaudio/best',
+        'noplaylist': True,
+        'quiet': True,
+        'default_search': 'ytsearch1',
     }
 
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(search, download=False)
+            url = info['entries'][0]['url'] if 'entries' in info else info['url']
+            title = info['entries'][0]['title'] if 'entries' in info else info['title']
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(search, download=False)
-        url = info['entries'][0]['url'] if 'entries' in info else info['url']
-        title = info['entries'][0]['title'] if 'entries' in info else info['title']
+        source = await discord.FFmpegOpusAudio.from_probe(url, method='fallback')
 
-    source = await discord.FFmpegOpusAudio.from_probe(url, method='fallback')
+        vc.stop()  # Stop current audio if any
+        vc.play(source)
 
-    vc.stop()  # Stop current audio if any
-    vc.play(source)
-
-    await ctx.send(f"🎶 Now playing: **{title}**")
+        await ctx.send(f"🎶 Now playing: **{title}**")
+    except Exception as e:
+        await ctx.send(f"❌ Error: {str(e)}")
 
 # Replace with your bot token
 bot.run(os.environ["DISCORD_TOKEN"])
